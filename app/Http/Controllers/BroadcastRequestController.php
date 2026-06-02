@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class BroadcastRequestController extends Controller
 {
@@ -27,7 +28,7 @@ class BroadcastRequestController extends Controller
         }
 
         $req = BroadcastRequest::create([
-            'citizen_id'    => auth()->id(),
+            'citizen_id'    => Auth::id(),
             'medicine_name' => $request->medicineName,
             'quantity'      => $request->quantity,
             'urgency'       => $request->urgency ?? 'standard',
@@ -47,7 +48,7 @@ class BroadcastRequestController extends Controller
     {
         $this->expireStale();
 
-        $query = BroadcastRequest::where('citizen_id', auth()->id());
+        $query = BroadcastRequest::where('citizen_id', Auth::id());
 
         if ($status = $request->query('status')) {
             $query->where('status', $status);
@@ -87,7 +88,7 @@ class BroadcastRequestController extends Controller
         $perPage   = min((int) $request->query('per_page', 20), 50);
         $paginated = $query->latest()->paginate($perPage);
 
-        $pharmacyId = auth()->id();
+        $pharmacyId = Auth::id();
 
         $requests = $paginated->map(fn(BroadcastRequest $r) => [
             'id'           => $r->id,
@@ -133,7 +134,7 @@ class BroadcastRequestController extends Controller
             ->where('expires_at', '>', now())
             ->findOrFail($id);
 
-        $pharmacy = auth()->user();
+        $pharmacy = Auth::user();
 
         // Prevent duplicate responses
         $existing = collect($broadcastReq->responses)->firstWhere('pharmacyId', $pharmacy->id);
@@ -168,7 +169,7 @@ class BroadcastRequestController extends Controller
 
     public function accept(string $id, string $pharmacyId): JsonResponse
     {
-        $broadcastReq = BroadcastRequest::where('citizen_id', auth()->id())
+        $broadcastReq = BroadcastRequest::where('citizen_id', Auth::id())
             ->where('status', 'open')
             ->findOrFail($id);
 
@@ -184,7 +185,7 @@ class BroadcastRequestController extends Controller
 
         // Create an order from the accepted response
         $order = Order::create([
-            'citizen_id'  => auth()->id(),
+            'citizen_id'  => Auth::id(),
             'pharmacy_id' => $pharmacyId,
             'medicines'   => [[
                 'medicineId'   => null, // broadcast requests may not have exact medicine IDs
@@ -223,7 +224,7 @@ class BroadcastRequestController extends Controller
 
     public function destroy(string $id): JsonResponse
     {
-        $broadcastReq = BroadcastRequest::where('citizen_id', auth()->id())->findOrFail($id);
+        $broadcastReq = BroadcastRequest::where('citizen_id', Auth::id())->findOrFail($id);
 
         $broadcastReq->update(['status' => 'closed', 'closed_at' => now()]);
 

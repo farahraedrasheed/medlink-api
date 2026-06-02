@@ -2,8 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class PharmacyVerifiedMiddleware
@@ -13,7 +15,8 @@ class PharmacyVerifiedMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $user = auth()->user();
+        /** @var User|null $user */
+        $user = Auth::user();
 
         if ($user && $user->isPharmacy() && ! $user->isVerified()) {
             return response()->json([

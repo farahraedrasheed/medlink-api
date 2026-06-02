@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Complaint;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class AdminComplaintController extends Controller
@@ -79,7 +80,7 @@ class AdminComplaintController extends Controller
         $complaint->update([
             'status'            => $request->status,
             'resolution'        => $request->resolution,
-            'assigned_admin_id' => auth()->id(),
+            'assigned_admin_id' => Auth::id(),
             'resolution_date'   => in_array($request->status, ['resolved', 'rejected']) ? now() : null,
         ]);
 
@@ -94,7 +95,7 @@ class AdminComplaintController extends Controller
     {
         $complaint = Complaint::findOrFail($id);
         $complaint->update([
-            'assigned_admin_id' => auth()->id(),
+            'assigned_admin_id' => Auth::id(),
             'status'            => 'in_review',
         ]);
 

@@ -6,6 +6,7 @@ use App\Models\Complaint;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class ComplaintController extends Controller
@@ -28,7 +29,7 @@ class ComplaintController extends Controller
         User::pharmacies()->findOrFail($request->againstPharmacyId);
 
         $complaint = Complaint::create([
-            'reporter_id'          => auth()->id(),
+            'reporter_id'          => Auth::id(),
             'against_pharmacy_id'  => $request->againstPharmacyId,
             'subject'              => $request->subject,
             'details'              => $request->details,
@@ -54,7 +55,7 @@ class ComplaintController extends Controller
     public function index(Request $request): JsonResponse
     {
         $query = Complaint::with('pharmacy')
-            ->where('reporter_id', auth()->id());
+            ->where('reporter_id', Auth::id());
 
         if ($status = $request->query('status')) {
             $query->where('status', $status);

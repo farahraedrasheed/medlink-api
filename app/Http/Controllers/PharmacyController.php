@@ -6,6 +6,7 @@ use App\Models\Favorite;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PharmacyController extends Controller
 {
@@ -40,7 +41,7 @@ class PharmacyController extends Controller
         $perPage   = min((int) $request->query('per_page', 12), 50);
         $paginated = $query->paginate($perPage);
 
-        $userId    = auth()->id();
+        $userId    = Auth::id();
         $favorites = $userId
             ? Favorite::where('citizen_id', $userId)->where('favorite_type', 'pharmacy')
                       ->pluck('favorite_id')->toArray()
@@ -100,7 +101,7 @@ class PharmacyController extends Controller
     {
         $pharmacy = User::pharmacies()->with(['inventory.medicine', 'reviews.citizen'])->findOrFail($id);
 
-        $userId = auth()->id();
+        $userId = Auth::id();
         $isFav  = $userId
             ? Favorite::where('citizen_id', $userId)
                       ->where('favorite_type', 'pharmacy')

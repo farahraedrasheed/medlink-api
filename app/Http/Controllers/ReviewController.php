@@ -6,6 +6,7 @@ use App\Models\Review;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class ReviewController extends Controller
@@ -28,7 +29,7 @@ class ReviewController extends Controller
         $pharmacy = User::pharmacies()->findOrFail($request->pharmacyId);
 
         $review = Review::updateOrCreate(
-            ['citizen_id' => auth()->id(), 'pharmacy_id' => $pharmacy->id],
+            ['citizen_id' => Auth::id(), 'pharmacy_id' => $pharmacy->id],
             ['rating' => $request->rating, 'review_text' => $request->reviewText]
         );
 
@@ -89,7 +90,7 @@ class ReviewController extends Controller
 
     public function destroy(string $id): JsonResponse
     {
-        $review = Review::where('citizen_id', auth()->id())->findOrFail($id);
+        $review = Review::where('citizen_id', Auth::id())->findOrFail($id);
         $review->delete();
 
         return response()->json(['success' => true, 'message' => 'Review deleted']);

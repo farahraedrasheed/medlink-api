@@ -109,9 +109,16 @@ Route::prefix('v1')->group(function () {
         Route::put('inventory/{id}',     [InventoryController::class, 'update']);
         Route::delete('inventory/{id}',  [InventoryController::class, 'destroy']);
 
-        // Network broadcast requests
-        Route::get('requests/network',              [BroadcastRequestController::class, 'network']);
+        // Network broadcast requests (pharmacy only)
         Route::post('requests/{id}/respond',        [BroadcastRequestController::class, 'respond']);
+    });
+
+    // ──────────────────────────────────────────────────────────────────────
+    // Pharmacy + Admin — broadcast request network view
+    // ──────────────────────────────────────────────────────────────────────
+
+    Route::middleware(['auth:api', 'role:pharmacy,admin', 'pharmacy.verified'])->group(function () {
+        Route::get('requests/network', [BroadcastRequestController::class, 'network']);
     });
 
     // ──────────────────────────────────────────────────────────────────────

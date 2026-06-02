@@ -20,7 +20,7 @@ return new class extends Migration
             $table->json('status_timeline')->nullable();
             $table->text('pharmacy_response')->nullable();
             $table->timestamp('response_date')->nullable();
-            $table->timestamp('order_date');
+            $table->timestamp('order_date')->useCurrent();
             $table->timestamp('expected_delivery')->nullable();
             $table->timestamp('completed_date')->nullable();
             $table->timestamps();

@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class OrderController extends Controller
@@ -70,7 +71,7 @@ class OrderController extends Controller
 
         $order = DB::transaction(function () use ($request, $pharmacy, $resolvedMedicines, $totalPrice) {
             $order = Order::create([
-                'citizen_id'  => auth()->id(),
+                'citizen_id'  => Auth::id(),
                 'pharmacy_id' => $pharmacy->id,
                 'medicines'   => $resolvedMedicines,
                 'total_price' => $totalPrice,
@@ -101,7 +102,8 @@ class OrderController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $user  = auth()->user();
+        /** @var \App\Models\User $user */
+        $user  = Auth::user();
         $query = Order::with(['citizen', 'pharmacy']);
 
         if ($user->isCitizen()) {
@@ -152,7 +154,8 @@ class OrderController extends Controller
 
     public function show(string $id): JsonResponse
     {
-        $user  = auth()->user();
+        /** @var \App\Models\User $user */
+        $user  = Auth::user();
         $order = Order::with(['citizen', 'pharmacy'])->findOrFail($id);
 
         // Authorization: only involved parties or admin
@@ -170,7 +173,8 @@ class OrderController extends Controller
 
     public function updateStatus(Request $request, string $id): JsonResponse
     {
-        $user  = auth()->user();
+        /** @var \App\Models\User $user */
+        $user  = Auth::user();
         $order = Order::findOrFail($id);
 
         // Only pharmacy or admin can change status
@@ -224,7 +228,8 @@ class OrderController extends Controller
 
     public function destroy(string $id): JsonResponse
     {
-        $user  = auth()->user();
+        /** @var \App\Models\User $user */
+        $user  = Auth::user();
         $order = Order::findOrFail($id);
 
         if ($user->isCitizen() && $order->citizen_id !== $user->id) {

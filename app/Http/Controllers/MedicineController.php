@@ -7,6 +7,7 @@ use App\Models\Favorite;
 use App\Models\Medicine;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class MedicineController extends Controller
@@ -57,7 +58,7 @@ class MedicineController extends Controller
         $perPage  = min((int) $request->query('per_page', 12), 50);
         $paginated = $query->paginate($perPage);
 
-        $userId   = auth()->id();
+        $userId   = Auth::id();
         $favorites = $userId
             ? Favorite::where('citizen_id', $userId)->where('favorite_type', 'medicine')
                       ->pluck('favorite_id')->toArray()
@@ -119,7 +120,7 @@ class MedicineController extends Controller
     {
         $medicine = Medicine::with(['category', 'inventory.pharmacy'])->active()->findOrFail($id);
 
-        $userId    = auth()->id();
+        $userId    = Auth::id();
         $isFav     = $userId
             ? Favorite::where('citizen_id', $userId)
                       ->where('favorite_type', 'medicine')

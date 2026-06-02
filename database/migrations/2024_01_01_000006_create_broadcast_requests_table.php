@@ -18,7 +18,7 @@ return new class extends Migration
             $table->enum('status', ['open', 'accepted', 'expired', 'closed'])->default('open');
             $table->json('responses')->nullable(); // pharmacy responses array
             $table->foreignUuid('accepted_pharmacy_id')->nullable()->constrained('users')->nullOnDelete();
-            $table->timestamp('expires_at');
+            $table->timestamp('expires_at')->useCurrent();
             $table->timestamp('closed_at')->nullable();
             $table->timestamps();
 

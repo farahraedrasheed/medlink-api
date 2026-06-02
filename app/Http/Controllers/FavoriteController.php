@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Favorite;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class FavoriteController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $query = Favorite::where('citizen_id', auth()->id());
+        $query = Favorite::where('citizen_id', Auth::id());
 
         if ($type = $request->query('type')) {
             if ($type !== 'all') {
@@ -58,7 +59,7 @@ class FavoriteController extends Controller
 
         $favorite = Favorite::firstOrCreate(
             [
-                'citizen_id'    => auth()->id(),
+                'citizen_id'    => Auth::id(),
                 'favorite_type' => $request->type,
                 'favorite_id'   => $request->targetId,
             ],
@@ -80,7 +81,7 @@ class FavoriteController extends Controller
 
     public function destroy(string $id): JsonResponse
     {
-        $favorite = Favorite::where('citizen_id', auth()->id())->findOrFail($id);
+        $favorite = Favorite::where('citizen_id', Auth::id())->findOrFail($id);
         $favorite->delete();
 
         return response()->json(['success' => true, 'message' => 'Removed from favorites']);
@@ -97,7 +98,7 @@ class FavoriteController extends Controller
             return response()->json(['success' => false, 'errors' => $v->errors()], 422);
         }
 
-        $existing = Favorite::where('citizen_id', auth()->id())
+        $existing = Favorite::where('citizen_id', Auth::id())
             ->where('favorite_type', $request->type)
             ->where('favorite_id', $request->targetId)
             ->first();
@@ -108,7 +109,7 @@ class FavoriteController extends Controller
         }
 
         Favorite::create([
-            'citizen_id'    => auth()->id(),
+            'citizen_id'    => Auth::id(),
             'favorite_type' => $request->type,
             'favorite_id'   => $request->targetId,
             'favorite_data' => $request->targetData ?? [],

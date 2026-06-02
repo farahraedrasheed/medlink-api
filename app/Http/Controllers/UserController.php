@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -14,7 +15,8 @@ class UserController extends Controller
 
     public function me(): JsonResponse
     {
-        $user = auth()->user();
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
 
         $data = [
             'id'           => $user->id,
@@ -53,7 +55,8 @@ class UserController extends Controller
 
     public function update(Request $request): JsonResponse
     {
-        $user = auth()->user();
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
 
         $rules = [
             'firstName' => 'sometimes|string|max:100',
@@ -125,7 +128,8 @@ class UserController extends Controller
             return $this->validationError($v->errors());
         }
 
-        $user = auth()->user();
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
 
         if (! Hash::check($request->currentPassword, $user->password)) {
             return response()->json([
@@ -156,7 +160,8 @@ class UserController extends Controller
             return $this->validationError($v->errors());
         }
 
-        $user = auth()->user();
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
 
         // Delete old avatar
         if ($user->profile_image) {

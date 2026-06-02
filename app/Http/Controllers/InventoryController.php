@@ -6,6 +6,7 @@ use App\Models\InventoryItem;
 use App\Models\Medicine;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class InventoryController extends Controller
@@ -14,7 +15,7 @@ class InventoryController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $pharmacyId = auth()->id();
+        $pharmacyId = Auth::id();
 
         $query = InventoryItem::with('medicine.category')
             ->where('pharmacy_id', $pharmacyId);
@@ -86,7 +87,7 @@ class InventoryController extends Controller
             return $this->validationError($v->errors());
         }
 
-        $pharmacyId = auth()->id();
+        $pharmacyId = Auth::id();
 
         // Check if this medicine is already in pharmacy's inventory
         $existing = InventoryItem::where('pharmacy_id', $pharmacyId)
@@ -124,7 +125,7 @@ class InventoryController extends Controller
 
     public function update(Request $request, string $id): JsonResponse
     {
-        $item = InventoryItem::where('pharmacy_id', auth()->id())->findOrFail($id);
+        $item = InventoryItem::where('pharmacy_id', Auth::id())->findOrFail($id);
 
         $v = Validator::make($request->all(), [
             'quantity'     => 'sometimes|integer|min:0',
@@ -171,7 +172,7 @@ class InventoryController extends Controller
 
     public function destroy(string $id): JsonResponse
     {
-        $item = InventoryItem::where('pharmacy_id', auth()->id())->findOrFail($id);
+        $item = InventoryItem::where('pharmacy_id', Auth::id())->findOrFail($id);
         $item->delete();
 
         return response()->json(['success' => true, 'message' => 'Item removed from inventory']);

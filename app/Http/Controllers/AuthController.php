@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -102,7 +103,7 @@ class AuthController extends Controller
             ], 401);
         }
 
-        $user = auth()->user();
+        $user = Auth::user();
 
         if (! $user->is_active) {
             return response()->json([
