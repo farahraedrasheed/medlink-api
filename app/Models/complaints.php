@@ -10,7 +10,6 @@ class Complaint extends Model
         'citizen_id', 'pharmacy_id', 'subject', 'body', 'status', 'admin_reply',
     ];
 
-    // status: open | in_review | resolved | rejected
     public function citizen()
     {
         return $this->belongsTo(User::class, 'citizen_id');
@@ -18,6 +17,6 @@ class Complaint extends Model
 
     public function pharmacy()
     {
-        return $this->belongsTo(Pharmacy::class);
+        return $this->belongsTo(User::class, 'pharmacy_id');
     }
 }

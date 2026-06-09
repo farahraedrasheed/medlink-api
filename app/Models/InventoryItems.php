@@ -18,11 +18,11 @@ class InventoryItem extends Model
 
     public function pharmacy()
     {
-        return $this->belongsTo(Pharmacy::class);
+        return $this->belongsTo(User::class, 'pharmacy_id');
     }
 
     public function medicine()
     {
-        return $this->belongsTo(medicines::class);
+        return $this->belongsTo(Medicine::class);
     }
 }
