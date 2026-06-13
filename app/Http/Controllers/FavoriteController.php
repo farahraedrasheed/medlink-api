@@ -119,3 +119,4 @@ class FavoriteController extends Controller
         return response()->json(['success' => true, 'message' => 'Added to favorites', 'isFavorite' => true]);
     }
 }
+ 

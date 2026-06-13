@@ -74,7 +74,8 @@ class InventoryController extends Controller
     public function store(Request $request): JsonResponse
     {
         $v = Validator::make($request->all(), [
-            'medicineId'   => 'required|uuid|exists:medicines,id',
+            'medicineId'   => 'nullable|uuid|exists:medicines,id',
+            'medicineName' => 'required_without:medicineId|string|max:255',
             'quantity'     => 'required|integer|min:0',
             'price'        => 'required|numeric|min:0',
             'costPrice'    => 'nullable|numeric|min:0',
@@ -89,9 +90,19 @@ class InventoryController extends Controller
 
         $pharmacyId = Auth::id();
 
+        // Resolve medicineId — find existing or create new medicine by name
+        $medicineId = $request->medicineId;
+        if (!$medicineId) {
+            $medicine = Medicine::firstOrCreate(
+                ['name' => $request->medicineName],
+                ['name' => $request->medicineName, 'generic_name' => $request->medicineName]
+            );
+            $medicineId = $medicine->id;
+        }
+
         // Check if this medicine is already in pharmacy's inventory
         $existing = InventoryItem::where('pharmacy_id', $pharmacyId)
-            ->where('medicine_id', $request->medicineId)
+            ->where('medicine_id', $medicineId)
             ->first();
 
         if ($existing) {
@@ -104,7 +115,7 @@ class InventoryController extends Controller
 
         $item = InventoryItem::create([
             'pharmacy_id'       => $pharmacyId,
-            'medicine_id'       => $request->medicineId,
+            'medicine_id'       => $medicineId,
             'quantity'          => $request->quantity,
             'price'             => $request->price,
             'cost_price'        => $request->costPrice,
